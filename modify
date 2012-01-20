@@ -1,0 +1,12 @@
+#!/bin/sh
+FILENAME=$1
+while read line
+do
+   if [ ! -z "$line" ]; then
+       echo $line | tr '\n' ' '
+   else
+       echo ""
+   fi
+done < $FILENAME 
+
+exit 0

@@ -1,0 +1,37 @@
+#!/bin/bash
+p=$1
+pc=$2
+rm -rf statica.dat
+	for j in 1 4 5 8 12 16 20 31 50 64 80 100 128 150 200 300 500
+        do
+                if [ $j -lt $p ]
+                then
+			echo $p $j
+			cut -d' ' -f$pc $p.$j >> option1.$p.dat
+			echo $j >> statica.dat
+		elif [ $j -eq $p ]
+		then
+			k=1
+			echo $p $j
+			cut -d' ' -f$pc $p.$p >> option1.$p.dat
+			echo $j >> statica.dat
+		fi
+	done
+
+	if [ $k -ne 1 ]
+	then
+		echo $p $j
+		cut -d' ' -f$pc $p.$p >> option1.$p.dat
+		echo $j >> statica.dat
+	fi
+
+#for i in 1 2 3 4 5 6 7 8 9 10 11 
+#do
+        #echo "$user " >> totalcycles
+        #sed -e 's/$/`echo "$user "`/g' < $FILENAME > totalcycles
+        #awk ' { print $1"\{ echo $user \} " } '  < $FILENAME > totalcyclesi
+
+ #       cut -d' ' -f$pc $p.$i >> option1.$p.dat
+
+#done
+
