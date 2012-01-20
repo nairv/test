@@ -1,0 +1,438 @@
+#!/bin/bash
+
+LOGO="Distribution  of various hardware PAPI counters across different problem sizes and tilesizes for kernel 2mm.c"
+option1="1. To see the distribution of 1 particular PAPI counter across 1 particular problem size "
+option2="2. To see the distribution of 1 particular PAPI counter 1 particular tile size and across different problem sizes"
+option3="3. To see the distribution of all the given PAPI counters across 1 particular problem size and 1 particular tilesize"
+choiceq="Please select between option 1 and 3 :"
+ex="Or Enter x|X to exit "
+papi1="1.PAPI_TOT_CYC - Total cycles "
+papi2="2.L1D:REPL - L1 data cache lines allocated "
+papi3="3.MEM_LOAD_RETIRED:L1D_HIT - Retired loads that hit the L1 data cache"
+papi4="4.LLC_REFERENCES - count each request originating from the core to reference a cache line in the last level cache. The count may include speculation, but excludes cache line fills due to hardware prefetch."
+papi5="5.MEM_LOAD_RETIRED:L2_HIT - Retired loads that hit the L1 data cache"
+papi6="6.LLC_MISSES - Requests missing the last level of the cache"
+papi7="7.MEM_LOAD_RETIRED:DTLB_MISS - Retired loads that miss the DTLB "
+papi8="8.SSEX_UOPS_RETIRED:SCALAR_DOUBLE - SIMD Scalar-Double Uops retired "
+papi9="9.SSEX_UOPS_RETIRED:PACKED_DOUBLE - SIMD Packed-Double Uops retired "
+papi10="10.UOPS_RETIRED:ANY - Uops retired "
+papi11="11.UNHALTED_CORE_CYCLES - Count of core clock cycles whenever the clock signal on the specific core is running "
+
+validate()
+{
+Number=$1
+
+if [ $Number -ne 0 -o $Number -eq 0 2>/dev/null ]
+then
+
+# An integer is either equal to 0 or not equal to 0.
+# 2>/dev/null suppresses error message.
+
+    echo "Supplied Input $Number is an Integer"
+	return 0
+
+else
+
+    echo "Supplied Input $Number is not an Integer."
+	return 1
+fi
+
+
+}
+
+displaypapimenu()
+{
+#clear
+echo ""
+echo ""
+echo "Please enter the required PAPI counter from the below options :"
+echo ""
+echo "----------------------------------------------------------------------------------------------------------------"
+echo ""$papi1
+echo ""$papi2
+echo ""$papi3
+echo ""$papi4
+echo ""$papi5
+echo ""$papi6
+echo ""$papi7
+echo ""$papi8
+echo ""$papi9
+echo ""$papi10
+echo ""$papi11
+echo "----------------------------------------------------------------------------------------------------------------"
+
+}
+
+displayproblemsize()
+{
+
+echo ""
+echo ""
+echo "Please enter the required problem size :"
+echo ""
+echo "----------------------------------------------------------------------------------------------------------------"
+echo "1.32"
+echo "2.50"
+echo "3.500"
+echo "4.512"
+echo "5.1000"
+echo "6.1024"
+echo "7.2000"
+echo "8.2048"
+echo ""
+echo "Please select from option 1 - 8 :"
+echo "----------------------------------------------------------------------------------------------------------------"
+
+
+}
+
+
+displaytilesize()
+{
+echo ""
+echo ""
+echo "Please enter the required tile size :"
+echo ""
+echo "----------------------------------------------------------------------------------------------------------------"
+echo "1.1"
+echo "2.4"
+echo "3.5"
+echo "4.8"
+echo "5.16"
+echo "6.31"
+echo "7.50"
+echo "8.80"
+echo "9.100"
+echo "10.128"
+echo "11.150"
+echo "12.200"
+echo "13.300"
+echo "14.500"
+echo ""
+echo "Please select from option 1 - 14 :"
+echo "----------------------------------------------------------------------------------------------------------------"
+
+}
+
+probsizeselection()
+{
+prsel=$1
+prsize=0
+
+case $prsel in 
+
+	1) prsize=32;;
+	2) prsize=50;;
+	3) prsize=500;;
+	4) prsize=512;;
+	5) prsize=1000;;
+	6) prsize=1024;;
+	7) prsize=2000;;
+	8) prsize=2048;;
+	*) echo "Invalid problem size selection ";return 1;;
+
+esac 
+echo $prsize
+return 0
+}
+
+
+tilesizeselection()
+{
+
+tsel=$1
+tsize=0
+
+case $tsel in
+	1) tsize=1;;
+	2) tsize=4;;
+	3) tsize=5;;
+	4) tsize=8;;
+	5) tsize=16;;
+	6) tsize=31;;
+	7) tsize=50;;
+	8) tsize=64;;
+	9) tsize=100;;
+	10) tsize=128;;
+	11) tsize=150;;
+	12) tsize=200;;
+	13) tsize=300;;
+	14) tsize=500;;
+	*) echo "Invalid tile size selection"; return 1;;
+
+esac
+echo $tsize
+return 0
+
+}
+
+
+
+
+asel() 
+{ 
+rm -rf testaa.plt
+rm -rf test.dat
+rm -rf option1.*.dat
+
+#clear; 
+echo $option1;
+while true
+do
+	#clear
+	MSG="Invalid selection of PAPI counter.Please select a value from above between 1 and 9"
+	# display the menu
+	displaypapimenu
+
+	# read user input
+	read papichoice1
+	validate $papichoice1
+
+	if [ "$?" -eq "0" ]
+	then
+		if [ $papichoice1 -ge 1 -a $papichoice1 -le 11 ]
+		then
+			break
+		else
+			echo $MSG
+		fi
+	else
+		echo $MSG
+	fi
+done
+	
+while true
+do
+	#clear
+	MSG="Invalid selection of problem size. Please enter a number between 1 and 8"
+	displayproblemsize
+	read probsize1
+	validate $probsize1
+	if [ "$?" -eq "0" ]
+	then
+		if [ $probsize1 -ge 1 -a $probsize1 -le 8 ]
+		then
+			break
+		else
+			echo $MSG
+		fi	
+	else
+		echo $MSG
+	fi
+done
+
+echo "The papi selection choice is $papichoice1"
+echo "The probsize selection is $probsize1"
+echo ""
+probsizeselection $probsize1
+
+if [ "$?" -eq "0" ]
+then
+	echo "The problem size selected is $prsize "
+else
+
+	echo $MSG
+	asel
+fi
+./option1 $prsize $papichoice1
+./makea $prsize $papichoice1
+gnuplot testaa.plt
+}
+
+
+
+bsel() 
+{ 
+rm -rf testbb.plt
+rm -rf test.dat
+rm -rf option2.*.dat
+
+clear; 
+echo $option2;
+
+while true
+do
+	MSG="Invalid selection of PAPI counter.Please select a value from above between 1 and 9"
+	displaypapimenu
+	read papichoice2
+
+	validate $papichoice2
+	if [ "$?" -eq "0" ]
+	then
+		if [ $papichoice2 -ge 1 -a $papichoice2 -le 11 ]
+                then
+                        break
+                else
+                        echo $MSG
+                fi
+	else
+		echo $MSG
+        fi
+done
+
+while true
+do
+	MSG="Invalid selection of tilesize.Please select a value from above between 1 and 8"
+	displaytilesize
+	read tilesize2
+
+	validate $tilesize2
+	if [ "$?" -eq "0" ]
+	then
+		if [ $tilesize2 -ge 1 -o $tilesize2 -le 8 ] 
+                then
+                        break
+                
+		else
+			echo $MSG
+		fi
+	else
+		echo $MSG
+        fi
+done
+
+echo " The papi choice number is $papichoice2"
+echo " The tilesize selection number is $tilesize2"
+echo ""
+tilesizeselection $tilesize2
+if [ "$?" -eq "0" ]
+then
+        echo "The tile size selected is $tsize "
+else
+
+        echo $MSG
+        bsel
+fi
+./option2 $tsize $papichoice2
+./makeb $tsize $papichoice2
+gnuplot testbb.plt
+
+}
+
+
+csel() 
+{ 
+rm -rf testcc.plt
+rm -rf test.dat
+rm -rf allcounters.*.dat
+
+clear; 
+echo $option3;
+while true
+do
+        #clear
+        MSG="Invalid selection of problem size. Please enter a number between 1 and 8"
+        displayproblemsize
+        read probsize3
+        validate $probsize3
+        if [ "$?" -eq "0" ]
+        then
+                if [ $probsize3 -ge 1 -a $probsize3 -le 8 ]
+                then
+                        break
+                else
+                        echo $MSG
+                fi
+        else
+                echo $MSG
+        fi
+done
+
+while true
+do
+        MSG="Invalid selection of tilesize.Please select a value from above between 1 and 8"
+        displaytilesize
+        read tilesize3
+
+        validate $tilesize3
+        if [ "$?" -eq "0" ]
+        then
+                if [ $tilesize3 -ge 1 -o $tilesize3 -le 8 ]
+                then
+                        break
+
+                else
+                        echo $MSG
+                fi
+        else
+                echo $MSG
+        fi
+done
+
+probsizeselection $probsize3
+if [ "$?" -eq "0" ]
+then
+        echo "The problem size selected is $prsize "
+else
+
+        echo $MSG
+        csel
+fi
+
+tilesizeselection $tilesize3
+if [ "$?" -eq "0" ]
+then
+        echo "The tile size selected is $tsize "
+else
+
+        echo $MSG
+        csel
+fi
+
+./allcounters $prsize $tsize
+./makec $prsize $tsize
+gnuplot testcc.plt
+}
+
+menu()
+{
+clear
+echo `date`
+echo ""
+echo ""
+echo "---------------------------------------------------------------------------------------------------------------------"
+echo ""
+echo $LOGO
+echo ""
+echo "---------------------------------------------------------------------------------------------------------------------"
+echo $option1
+echo $option2
+echo $option3
+echo ""
+echo "---------------------------------------------------------------------------------------------------------------------"
+echo $choiceq
+echo ""
+echo ""
+echo ""
+echo $ex
+}
+
+while true
+do
+menu
+echo ""
+echo $MSG
+read answer
+
+case $answer in 
+
+	x|X) exit 0
+
+esac
+
+validate $answer
+
+if [ "$?" -eq "0" ]
+then
+	case $answer in
+	1|"1") asel;break;;
+	2|"2") bsel;break;;
+	3|"3") csel;break;;
+	*) MSG="Invalid input .. Please enter a number from 1 to 3 ..";;
+	esac
+
+else
+	MSG="Invalid input .. Please enter only numbers from 1 to 3 .."		
+fi
+
+done
