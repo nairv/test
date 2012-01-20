@@ -1,0 +1,14 @@
+rm -rf testcc.plt
+rm -rf output.png
+p=$1
+t=$2
+echo set terminal png >> testcc.plt
+echo "set output 'output.png'" >> testcc.plt
+echo "set title 'Distribution of given PAPI counters values'" >> testcc.plt
+echo "set xlabel 'PAPI Counters'" >> testcc.plt
+echo "set ylabel 'Count'" >> testcc.plt
+echo set autoscale y >> testcc.plt
+set xrange [0 :11 ] >> testcc.plt
+echo "!paste static.dat allcounters.$p.$t.dat > test.dat" >> testcc.plt
+echo "plot 'test.dat' using 1:2" >> testcc.plt
+

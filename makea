@@ -1,0 +1,14 @@
+rm -rf testaa.plt
+rm -rf output.png
+p=$1
+pc=$2
+echo "set terminal png ">> testaa.plt
+echo "set output 'output.png'" >> testaa.plt
+echo "set title 'Distribution of a particular PAPI counter value across a problem size'" >> testaa.plt
+echo "set xlabel 'Tile sizes'" >> testaa.plt
+echo "set ylabel 'Count'" >> testaa.plt
+echo "set autoscale y" >> testaa.plt
+echo "set xrange [0 :$p ]" >> testaa.plt
+echo "!paste statica.dat option1.$p.dat > test.dat" >> testaa.plt
+echo "plot 'test.dat' using 1:2" >> testaa.plt
+

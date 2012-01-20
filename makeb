@@ -1,0 +1,14 @@
+rm -rf testbb.plt
+rm -rf output.png
+p=$1
+pc=$2
+echo "set terminal png ">> testbb.plt
+echo "set output 'output.png'" >> testbb.plt
+echo "set title 'Distribution of a particular PAPI counter value across a tile size'" >> testbb.plt
+echo "set xlabel 'Problem sizes'" >> testbb.plt
+echo "set ylabel 'Count'" >> testbb.plt
+echo "set logscale y" >> testbb.plt
+echo "set xrange [32:512] ">> testbb.plt
+echo "!paste statica.dat option2.$p.dat > test.dat" >> testbb.plt
+echo "plot 'test.dat' using 1:2" >> testbb.plt
+
